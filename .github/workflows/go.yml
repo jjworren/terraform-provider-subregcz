@@ -1,0 +1,37 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23.4'
+
+    - name: Build Linux/amd64
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o terraform-provider-subregcz_linux_amd64 -a -ldflags '-extldflags "-static"' .
+
+    - name: Build Linux/arm64
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o terraform-provider-subregcz_linux_arm64 -a -ldflags '-extldflags "-static"' .
+    
+    - name: Build Linux/amd64
+      run: CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o terraform-provider-subregcz_darvin_amd64 -a -ldflags '-extldflags "-static"' .
+      
+    - name: Build Darwin/arm64
+      run: CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o terraform-provider-subregcz_darvin_arm64 -a -ldflags '-extldflags "-static"' .
+
+    - name: Test
+      run: go test -v ./...
